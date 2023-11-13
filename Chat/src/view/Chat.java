@@ -6,10 +6,6 @@ package view;
  */
 public class Chat extends javax.swing.JFrame {
 
-    /**
-     * Creates new form Janela
-     */
-    
     public Chat() {
         initComponents();
         config();
