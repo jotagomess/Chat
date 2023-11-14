@@ -1,12 +1,12 @@
-package control;
+package chat.control;
 
 import java.net.Socket;
 import java.util.ArrayList;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import model.Mensagem;
-import model.Mensagem;
+import chat.model.Mensagem;
+import chat.model.Mensagem;
 
 /**
  *

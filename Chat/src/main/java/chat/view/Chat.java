@@ -1,4 +1,4 @@
-package view;
+package chat.view;
 
 /**
  *
@@ -33,10 +33,10 @@ public class Chat extends javax.swing.JFrame {
         userList = new javax.swing.JPanel();
         offline = new javax.swing.JRadioButton();
         online = new javax.swing.JRadioButton();
-        enviarDmBtn = new javax.swing.JButton();
         listarBtn = new javax.swing.JButton();
         listarDmBtn = new javax.swing.JButton();
         desconectar = new javax.swing.JButton();
+        enviarDmBtn = new javax.swing.JButton();
         enviarBtn = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -51,15 +51,29 @@ public class Chat extends javax.swing.JFrame {
         msgList.setBackground(new java.awt.Color(255, 255, 255));
         jScrollPane1.setViewportView(msgList);
 
+        jSeparator1.setBackground(new java.awt.Color(0, 0, 0));
+
         jLabel2.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
         jLabel2.setForeground(new java.awt.Color(0, 0, 0));
         jLabel2.setText("Chat Global");
 
         msgTxt.setBackground(new java.awt.Color(255, 255, 255));
-        msgTxt.setText("Escreva sua mensagem");
+        msgTxt.setForeground(new java.awt.Color(0, 0, 0));
+        msgTxt.setText("  Escreva sua mensagem");
+        msgTxt.setToolTipText("");
+        msgTxt.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mousePressed(java.awt.event.MouseEvent evt) {
+                msgTxtMousePressed(evt);
+            }
+        });
         msgTxt.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 msgTxtActionPerformed(evt);
+            }
+        });
+        msgTxt.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                msgTxtKeyPressed(evt);
             }
         });
 
@@ -68,6 +82,8 @@ public class Chat extends javax.swing.JFrame {
         jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
         jLabel1.setForeground(new java.awt.Color(0, 0, 0));
         jLabel1.setText("Usuários");
+
+        jSeparator2.setBackground(new java.awt.Color(0, 0, 0));
 
         userList.setBackground(new java.awt.Color(255, 255, 255));
 
@@ -79,10 +95,11 @@ public class Chat extends javax.swing.JFrame {
         );
         userListLayout.setVerticalGroup(
             userListLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 296, Short.MAX_VALUE)
+            .addGap(0, 308, Short.MAX_VALUE)
         );
 
-        offline.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        offline.setBackground(new java.awt.Color(102, 102, 102));
+        offline.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         offline.setForeground(new java.awt.Color(0, 0, 0));
         offline.setText("Offline");
         offline.addActionListener(new java.awt.event.ActionListener() {
@@ -91,26 +108,26 @@ public class Chat extends javax.swing.JFrame {
             }
         });
 
-        online.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        online.setBackground(new java.awt.Color(102, 102, 102));
+        online.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         online.setForeground(new java.awt.Color(0, 0, 0));
         online.setText("Online");
-
-        enviarDmBtn.setBackground(new java.awt.Color(255, 255, 255));
-        enviarDmBtn.setForeground(new java.awt.Color(0, 0, 0));
-        enviarDmBtn.setText("Enviar mensagem privada");
 
         listarBtn.setBackground(new java.awt.Color(255, 255, 255));
         listarBtn.setForeground(new java.awt.Color(0, 0, 0));
         listarBtn.setText("Listar mensagens");
 
         listarDmBtn.setBackground(new java.awt.Color(255, 255, 255));
-        listarDmBtn.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         listarDmBtn.setForeground(new java.awt.Color(0, 0, 0));
         listarDmBtn.setText("Listar mensagens diretas");
 
         desconectar.setBackground(new java.awt.Color(255, 255, 255));
         desconectar.setForeground(new java.awt.Color(0, 0, 0));
         desconectar.setText("Desconectar");
+
+        enviarDmBtn.setBackground(new java.awt.Color(255, 255, 255));
+        enviarDmBtn.setForeground(new java.awt.Color(0, 0, 0));
+        enviarDmBtn.setText("Enviar mensagem direta");
 
         javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
         jPanel5.setLayout(jPanel5Layout);
@@ -129,7 +146,6 @@ public class Chat extends javax.swing.JFrame {
                             .addGroup(jPanel5Layout.createSequentialGroup()
                                 .addGap(20, 20, 20)
                                 .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(enviarDmBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 177, javax.swing.GroupLayout.PREFERRED_SIZE)
                                     .addComponent(userList, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                     .addComponent(listarBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 177, javax.swing.GroupLayout.PREFERRED_SIZE)
                                     .addComponent(listarDmBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 177, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -138,7 +154,8 @@ public class Chat extends javax.swing.JFrame {
                                         .addGap(9, 9, 9)
                                         .addComponent(online, javax.swing.GroupLayout.PREFERRED_SIZE, 71, javax.swing.GroupLayout.PREFERRED_SIZE)
                                         .addGap(18, 18, 18)
-                                        .addComponent(offline)))))
+                                        .addComponent(offline))
+                                    .addComponent(enviarDmBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 177, javax.swing.GroupLayout.PREFERRED_SIZE))))
                         .addGap(0, 17, Short.MAX_VALUE)))
                 .addContainerGap())
         );
@@ -149,7 +166,7 @@ public class Chat extends javax.swing.JFrame {
                 .addComponent(jLabel1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jSeparator2, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(userList, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(28, 28, 28)
                 .addComponent(enviarDmBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -159,11 +176,11 @@ public class Chat extends javax.swing.JFrame {
                 .addComponent(listarDmBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addComponent(desconectar, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(43, 43, 43)
+                .addGap(32, 32, 32)
                 .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(online)
                     .addComponent(offline))
-                .addContainerGap(43, Short.MAX_VALUE))
+                .addContainerGap(54, Short.MAX_VALUE))
         );
 
         enviarBtn.setBackground(new java.awt.Color(255, 255, 255));
@@ -260,40 +277,35 @@ public class Chat extends javax.swing.JFrame {
     }//GEN-LAST:event_offlineActionPerformed
 
     private void msgTxtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_msgTxtActionPerformed
-        // TODO add your handling code here:
+        msgTxt.setText("  Escreva sua mensagem");
     }//GEN-LAST:event_msgTxtActionPerformed
+
+    private void msgTxtMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_msgTxtMousePressed
+        msgTxt.setText("");
+    }//GEN-LAST:event_msgTxtMousePressed
+
+    private void msgTxtKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_msgTxtKeyPressed
+        msgTxt.setText("");
+    }//GEN-LAST:event_msgTxtKeyPressed
     
-//    public static void main(String args[]) {
-//        /* Set the Nimbus look and feel */
-//        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-//        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-//         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-//         */
-//        try {
-//            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-//                if ("Nimbus".equals(info.getName())) {
-//                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-//                    break;
-//                }
-//            }
-//        } catch (ClassNotFoundException ex) {
-//            java.util.logging.Logger.getLogger(Janela.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-//        } catch (InstantiationException ex) {
-//            java.util.logging.Logger.getLogger(Janela.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-//        } catch (IllegalAccessException ex) {
-//            java.util.logging.Logger.getLogger(Janela.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-//        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-//            java.util.logging.Logger.getLogger(Janela.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-//        }
-//        //</editor-fold>
-//
-//        /* Create and display the form */
-//        java.awt.EventQueue.invokeLater(new Runnable() {
-//            public void run() {
-//                new Janela().setVisible(true);
-//            }
-//        });
-//    }
+   public static void main(String args[]) {
+        /* Set the Nimbus look and feel */
+        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
+        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
+         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html
+         */
+        for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+            if ("Nimbus".equals(info.getName())) {
+                break;
+            }
+        } //</editor-fold>
+
+       java.awt.EventQueue.invokeLater(new Runnable() {
+           public void run() {
+               new Chat().setVisible(true);
+           }
+        });
+    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton desconectar;

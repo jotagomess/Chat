@@ -1,5 +1,4 @@
-
-package dao;
+package chat.dao;
 
 /**
  *
