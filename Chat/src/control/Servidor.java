@@ -7,7 +7,7 @@ import java.util.ArrayList;
 
 /**
  *
- * @author arthu
+ * @author jota
  */
 public class Servidor {
     private ServerSocket soquete_servidor;

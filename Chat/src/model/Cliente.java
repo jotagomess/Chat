@@ -2,7 +2,7 @@ package model;
 
 /**
  *
- * @author 0063498
+ * @author jota
  */
 public class Cliente {
     private String nome;

@@ -1,9 +1,8 @@
-
 package view;
 
 /**
  *
- * @author 0063498
+ * @author jota
  */
 public class JanelaLogin extends javax.swing.JFrame {
 
