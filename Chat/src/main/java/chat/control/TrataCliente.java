@@ -52,6 +52,8 @@ public class TrataCliente implements Runnable {
                     break;
                 }
                 
+                
+                
             } while (mensagem.getTexto().equals("sair"));
             finalizar();
         } catch (Exception e) {

@@ -9,6 +9,7 @@ public class Mensagem implements Serializable {
 
     private String nome;
     private String texto;
+    private String tipo;
 
     public Mensagem(String nome, String texto) {
         super();
@@ -32,6 +33,14 @@ public class Mensagem implements Serializable {
         this.texto = texto;
     }
 
+    public String getTipo() {
+        return tipo;
+    }
+
+    public void setTipo(String tipo) {
+        this.tipo = tipo;
+    }
+    
     @Override
     public String toString() {
         return nome+": " + texto + "\n\n";

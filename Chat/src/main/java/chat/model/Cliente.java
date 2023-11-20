@@ -15,8 +15,8 @@ public class Cliente {
     private ObjectOutputStream saida;
     private ObjectInputStream entrada;
     private String nome;
-    private String senha;
-    private boolean online;
+    private int id;
+    private boolean on;
     
     public Cliente(String endereco, int porta, String nome) throws Exception {
         super();
@@ -25,7 +25,10 @@ public class Cliente {
         this.entrada = new ObjectInputStream(this.soquete.getInputStream());
         this.nome = nome;
     }
-
+    
+    public Cliente() {
+    }
+    
     public String getNome() {
         return nome;
     }
@@ -34,20 +37,20 @@ public class Cliente {
         this.nome = nome;
     }
 
-    public String getSenha() {
-        return senha;
-    }
-
-    public void setSenha(String senha) {
-        this.senha = senha;
-    }
-
     public boolean isOnline() {
-        return online;
+        return on;
     }
 
     public void setOnline(boolean online) {
-        this.online = online;
+        this.on = online;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
     
     public void enviar_mensagem(Object mensagem) throws Exception {
