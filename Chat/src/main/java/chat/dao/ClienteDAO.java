@@ -7,6 +7,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import chat.model.Cliente;
 import chat.tools.FactoryPostgres;
+import javax.swing.JOptionPane;
 
 public class ClienteDAO {
     private Connection c;
@@ -14,8 +15,7 @@ public class ClienteDAO {
     public ClienteDAO() {
         this.c = FactoryPostgres.getConexaoPostgres();
     }
-    
-    
+
     public boolean insert(Cliente cliente) {
         String sql = "INSERT INTO Clientes(nome, online) VALUES (?,?) returning id";
         
@@ -28,7 +28,7 @@ public class ClienteDAO {
                 cliente.setId(resultado.getInt("id"));
             }
         }catch(SQLException ex){
-            System.out.println(ex.getMessage());
+            JOptionPane.showMessageDialog(null, ex.getMessage());
         }
         return true;
     }
@@ -51,7 +51,7 @@ public class ClienteDAO {
             }
             
         }catch(SQLException ex){
-            System.out.println(ex.getMessage());
+            JOptionPane.showMessageDialog(null, ex.getMessage());
         }
         
         return retorno;
@@ -75,7 +75,7 @@ public class ClienteDAO {
                 return null;
             }
         }catch(SQLException ex){
-            System.out.println(ex.getMessage());
+            JOptionPane.showMessageDialog(null, ex.getMessage());
             return null;
         }
     }
@@ -98,7 +98,7 @@ public class ClienteDAO {
                 return null;
             }
         }catch(SQLException ex){
-            System.out.println(ex.getMessage());
+            JOptionPane.showMessageDialog(null, ex.getMessage());
             return null;
         }
     }
@@ -113,7 +113,7 @@ public class ClienteDAO {
             trans.execute();
             return true;
         }catch(SQLException ex){
-            System.out.println(ex.getMessage());
+            JOptionPane.showMessageDialog(null, ex.getMessage());
             return false;
         }
     }
