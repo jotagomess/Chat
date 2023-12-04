@@ -1,4 +1,4 @@
-package tool;
+package chat.tools;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
