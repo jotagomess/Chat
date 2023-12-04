@@ -15,9 +15,9 @@ public class Cliente implements Serializable {
     private Socket soquete;
     private ObjectOutputStream saida;
     private ObjectInputStream entrada;
+    private int id;
     private String nome;
-    private String senha;
-    private boolean online;
+    private boolean conectado;
     
     public Cliente(String endereco, int porta, String nome) throws Exception {
         super();
@@ -27,6 +27,20 @@ public class Cliente implements Serializable {
         this.nome = nome;
     }
 
+    public Cliente(int id, String nome, boolean conectado) {
+        this.id = id;
+        this.nome = nome;
+        this.conectado = conectado;
+    }
+    
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+     
     public String getNome() {
         return nome;
     }
@@ -35,20 +49,12 @@ public class Cliente implements Serializable {
         this.nome = nome;
     }
 
-    public String getSenha() {
-        return senha;
+    public boolean isConectado() {
+        return conectado;
     }
 
-    public void setSenha(String senha) {
-        this.senha = senha;
-    }
-
-    public boolean isOnline() {
-        return online;
-    }
-
-    public void setOnline(boolean online) {
-        this.online = online;
+    public void setConectado(boolean on) {
+        this.conectado = on;
     }
     
     public void enviar_mensagem(Object mensagem) throws Exception {
@@ -62,4 +68,5 @@ public class Cliente implements Serializable {
     public void finalizar() throws IOException {
         this.soquete.close();
     }
+    
 }

@@ -1,4 +1,4 @@
-package tool;
+package chat.tools;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -15,7 +15,7 @@ public class FactoryPostgres {
     public static Connection getConexaoPostgres() {
         if(c == null) {
             try {
-                c = DriverManager.getConnection("jdbc:postgresql://10.90.24.54:5432/postgres", "postgres", "postgres");
+                c = DriverManager.getConnection("jdbc:postgresql://localhost:5432/postgres", "postgres", "postgres");
             } catch (SQLException ex) {
                 JOptionPane.showMessageDialog(null, "Houve um erro na conexão!", "Falha na conexão", JOptionPane.ERROR_MESSAGE);
                 return null;

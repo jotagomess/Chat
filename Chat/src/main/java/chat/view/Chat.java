@@ -2,6 +2,7 @@ package chat.view;
 
 import chat.model.Cliente;
 import chat.model.Mensagem;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListModel;
 
 /**
@@ -12,6 +13,7 @@ public class Chat extends javax.swing.JFrame {
 
     private DefaultListModel<Cliente> usuarios;
     private DefaultListModel<Mensagem> mensagens;
+    private DefaultComboBoxModel<String> destinatarios;
     
     public Chat() {
         initComponents();
@@ -23,9 +25,13 @@ public class Chat extends javax.swing.JFrame {
         this.setLocationRelativeTo(null);
         this.usuarios = new DefaultListModel<>();
         this.mensagens = new DefaultListModel<>();
+        this.destinatarios = new DefaultComboBoxModel<>();
+        
+        this.destinatarios.addElement("Todo mundo");
         
         this.userList.setModel(usuarios);
         this.msgList.setModel(mensagens);
+        this.jComboBox.setModel(destinatarios);
         this.setChatEnabled(false);
     }
     
@@ -39,6 +45,7 @@ public class Chat extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jLabel2 = new javax.swing.JLabel();
         jPanel1 = new javax.swing.JPanel();
         jSeparator1 = new javax.swing.JSeparator();
         jScrollPane2 = new javax.swing.JScrollPane();
@@ -59,6 +66,10 @@ public class Chat extends javax.swing.JFrame {
         jLabel9 = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
         carregarBtn = new javax.swing.JButton();
+        jComboBox = new javax.swing.JComboBox<>();
+        jLabel4 = new javax.swing.JLabel();
+
+        jLabel2.setText("jLabel2");
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setResizable(false);
@@ -163,6 +174,21 @@ public class Chat extends javax.swing.JFrame {
         carregarBtn.setIcon(new javax.swing.ImageIcon(getClass().getResource("/private-sent.png"))); // NOI18N
         carregarBtn.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
 
+        jComboBox.setBackground(new java.awt.Color(255, 255, 255));
+        jComboBox.setFont(new java.awt.Font("Comic Sans MS", 0, 14)); // NOI18N
+        jComboBox.setForeground(new java.awt.Color(0, 0, 0));
+        jComboBox.setMaximumRowCount(3);
+        jComboBox.setSelectedIndex(-1);
+        jComboBox.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                jComboBoxItemStateChanged(evt);
+            }
+        });
+
+        jLabel4.setFont(new java.awt.Font("Comic Sans MS", 0, 18)); // NOI18N
+        jLabel4.setForeground(new java.awt.Color(0, 0, 0));
+        jLabel4.setText("Enviar mensagem para:");
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -188,7 +214,7 @@ public class Chat extends javax.swing.JFrame {
                 .addComponent(jSeparator3, javax.swing.GroupLayout.PREFERRED_SIZE, 9, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 79, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 92, Short.MAX_VALUE)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                                 .addComponent(jSeparator2, javax.swing.GroupLayout.PREFERRED_SIZE, 320, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -212,12 +238,17 @@ public class Chat extends javax.swing.JFrame {
                 .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 11, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(18, 18, 18)
-                        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 195, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGap(56, 56, 56)
-                        .addComponent(jLabel3)))
-                .addGap(28, 28, 28))
+                        .addComponent(jLabel3))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGap(18, 18, 18)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel4)
+                            .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 195, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addGap(15, 15, 15)
+                                .addComponent(jComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 162, javax.swing.GroupLayout.PREFERRED_SIZE)))))
+                .addGap(25, 25, 25))
             .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addGroup(jPanel1Layout.createSequentialGroup()
                     .addGap(355, 355, 355)
@@ -254,7 +285,11 @@ public class Chat extends javax.swing.JFrame {
                         .addComponent(jLabel3)
                         .addGap(18, 18, 18)
                         .addComponent(jScrollPane2)
-                        .addGap(19, 19, 19)))
+                        .addGap(18, 18, 18)
+                        .addComponent(jLabel4)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(jComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(34, 34, 34)))
                 .addGap(10, 10, 10))
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addGap(16, 16, 16)
@@ -313,6 +348,10 @@ public class Chat extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_connectBtnActionPerformed
 
+    private void jComboBoxItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_jComboBoxItemStateChanged
+        
+    }//GEN-LAST:event_jComboBoxItemStateChanged
+
     public static void main(String args[]) {
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
@@ -337,8 +376,11 @@ public class Chat extends javax.swing.JFrame {
     private javax.swing.JButton connectBtn;
     private javax.swing.JButton disconnectBtn;
     private javax.swing.JButton enviarBtn;
+    private javax.swing.JComboBox<String> jComboBox;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
     private javax.swing.JPanel jPanel1;

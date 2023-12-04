@@ -7,28 +7,28 @@ import java.io.Serializable;
  */
 public class Mensagem implements Serializable {
     
-    private long id;
+    private int id;
     private String nome;
     private String texto;
     private String action;
-    private long remetente;
-    private long destinatario;
+    private int remetente;
+    private int destinatario;
     
-    public Mensagem(String nome, long id, String texto) {
+    public Mensagem(String nome, int id, String texto) {
         super();
         this.nome = nome;
         this.id = id;
         this.texto = texto;
     }
 
-    public Mensagem(long id , String texto, long destinatario, long remetente) {
+    public Mensagem(int id , String texto, int remetente, int destinatario) {
         this.id = id;
         this.destinatario = destinatario;
         this.remetente = remetente;
         this.texto = texto;
     }
 
-    public Mensagem(long id, long remetente, String texto) {
+    public Mensagem(int id, int remetente, String texto) {
         this.destinatario = 0;
         this.id = id;
         this.remetente = remetente;
@@ -39,7 +39,7 @@ public class Mensagem implements Serializable {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(int id) {
         this.id = id;
     }
     
@@ -76,7 +76,7 @@ public class Mensagem implements Serializable {
         return remetente;
     }
 
-    public void setRemetente(long remetente) {
+    public void setRemetente(int remetente) {
         this.remetente = remetente;
     }
 
@@ -84,7 +84,7 @@ public class Mensagem implements Serializable {
         return destinatario;
     }
 
-    public void setDestinatario(long destinatario) {
+    public void setDestinatario(int destinatario) {
         this.destinatario = destinatario;
     }
     
