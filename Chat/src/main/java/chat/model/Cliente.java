@@ -3,20 +3,21 @@ package chat.model;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.net.Socket;
 
 /**
  *
  * @author jota
  */
-public class Cliente {
+public class Cliente implements Serializable {
     
     private Socket soquete;
     private ObjectOutputStream saida;
     private ObjectInputStream entrada;
     private String nome;
-    private int id;
-    private boolean on;
+    private String senha;
+    private boolean online;
     
     public Cliente(String endereco, int porta, String nome) throws Exception {
         super();
@@ -25,10 +26,7 @@ public class Cliente {
         this.entrada = new ObjectInputStream(this.soquete.getInputStream());
         this.nome = nome;
     }
-    
-    public Cliente() {
-    }
-    
+
     public String getNome() {
         return nome;
     }
@@ -37,20 +35,20 @@ public class Cliente {
         this.nome = nome;
     }
 
+    public String getSenha() {
+        return senha;
+    }
+
+    public void setSenha(String senha) {
+        this.senha = senha;
+    }
+
     public boolean isOnline() {
-        return on;
+        return online;
     }
 
     public void setOnline(boolean online) {
-        this.on = online;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
+        this.online = online;
     }
     
     public void enviar_mensagem(Object mensagem) throws Exception {
