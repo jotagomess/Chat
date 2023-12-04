@@ -9,8 +9,7 @@ public class Mensagem implements Serializable {
 
     private String nome;
     private String texto;
-    private String action;
-    
+
     public Mensagem(String nome, String texto) {
         super();
         this.nome = nome;
@@ -33,14 +32,6 @@ public class Mensagem implements Serializable {
         this.texto = texto;
     }
 
-    public String getAction() {
-        return action;
-    }
-
-    public void setAction(String action) {
-        this.action = action;
-    }
-    
     @Override
     public String toString() {
         return nome+": " + texto + "\n\n";

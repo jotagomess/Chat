@@ -3,14 +3,13 @@ package chat.model;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.Serializable;
 import java.net.Socket;
 
 /**
  *
  * @author jota
  */
-public class Cliente implements Serializable {
+public class Cliente {
     
     private Socket soquete;
     private ObjectOutputStream saida;
