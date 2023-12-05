@@ -59,7 +59,7 @@ public class ClienteDAO {
     
     public ArrayList<Cliente> getAll() {
         ArrayList<Cliente> clientes = new ArrayList<>();
-        String sql = "SELECT id, nome, conectado FROM chat.clientes ORDER BY conectado";
+        String sql = "SELECT id, nome, conectado FROM chat.clientes ORDER BY id";
         
         try(PreparedStatement trans = this.c.prepareStatement(sql)) {
             ResultSet resultado = trans.executeQuery();

@@ -14,8 +14,10 @@ public class Mensagem implements Serializable {
     private String nome;
     private String texto;
     private String action;
-    private int remetente;
-    private int destinatario;
+    private int idRemetente;
+    private int idDestinatario;
+    
+    private String destinatario;
     
     public Mensagem(String nome, String texto) {
         super();
@@ -29,17 +31,16 @@ public class Mensagem implements Serializable {
         this.texto = texto;
     }
 
-    public Mensagem(int id , String texto, int remetente, int destinatario) {
-        this.id = id;
-        this.destinatario = destinatario;
-        this.remetente = remetente;
+    public Mensagem(String nome , String texto, String destisnatario) {
+        this.nome = nome;
         this.texto = texto;
+        this.destinatario = destisnatario;
     }
-
+    
     public Mensagem(int id, int remetente, String texto) {
-        this.destinatario = 0;
+        this.idDestinatario = 0;
         this.id = id;
-        this.remetente = remetente;
+        this.idRemetente = remetente;
         this.texto = texto;
     }
 
@@ -80,20 +81,23 @@ public class Mensagem implements Serializable {
         return nome+": " + texto + "\n";
     }
 
-    public long getRemetente() {
-        return remetente;
+    public long getIdRemetente() {
+        return idRemetente;
     }
 
-    public void setRemetente(int remetente) {
-        this.remetente = remetente;
+    public void setIdRemetente(int remetente) {
+        this.idRemetente = remetente;
     }
 
-    public long getDestinatario() {
+    public long getIdDestinatario() {
+        return idDestinatario;
+    }
+
+    public void setIdDestinatario(int destinatario) {
+        this.idDestinatario = destinatario;
+    }
+
+    public String getDestinatario() {
         return destinatario;
     }
-
-    public void setDestinatario(int destinatario) {
-        this.destinatario = destinatario;
-    }
-    
 }

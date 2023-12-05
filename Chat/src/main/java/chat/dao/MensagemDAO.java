@@ -27,7 +27,7 @@ public class MensagemDAO {
         
         try (PreparedStatement trans = conexao.prepareStatement(sql)) {
             trans.setString(1, mensagem.getTexto());
-            trans.setInt(2, (int) mensagem.getRemetente());
+            trans.setInt(2, (int) mensagem.getIdRemetente());
 
             ResultSet result = trans.executeQuery();
             if (result.next()) {
@@ -45,8 +45,8 @@ public class MensagemDAO {
         String sql = "INSERT INTO chat.privada(id_remetente, id_destinatario, texto) VALUES (?, ?, ?) returning id";
         
         try (PreparedStatement trans = conexao.prepareStatement(sql)) {
-            trans.setInt(1, (int) mensagem.getRemetente());
-            trans.setInt(2, (int) mensagem.getDestinatario());
+            trans.setInt(1, (int) mensagem.getIdRemetente());
+            trans.setInt(2, (int) mensagem.getIdDestinatario());
             trans.setString(3, mensagem.getTexto());
 
             ResultSet result = trans.executeQuery();

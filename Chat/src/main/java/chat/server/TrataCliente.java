@@ -16,27 +16,22 @@ import java.net.SocketException;
  * @author jota
  */
 public class TrataCliente implements Runnable {
-    
+
     private static final String SUCESSO = "SUCESSO", FALHA = "ERRO";
-    
+
     private Socket clienteSocket;
     private ObjectOutputStream saida;
     private ObjectInputStream entrada;
-    private ArrayList<Mensagem> mensagens;
-    private ArrayList<Socket> clientesConectados;
     private ClienteDAO clienteDAO;
-    private MensagemDAO msgDAO;
-    
+    private MensagemDAO mensagemDAO;
+    private int id;
+
     public TrataCliente(Socket soquete_cliente) throws Exception {
-        this.mensagens = mensagens;
         this.clienteSocket = soquete_cliente;
-        
         this.saida = new ObjectOutputStream(this.clienteSocket.getOutputStream());
         this.entrada = new ObjectInputStream(this.clienteSocket.getInputStream());
-        
-        this.clientesConectados = clientesConectados;
         this.clienteDAO = new ClienteDAO();
-        this.msgDAO = new MensagemDAO();
+        this.mensagemDAO = new MensagemDAO();
     }
 
     public void enviar_mensagem(Object mensagem) throws Exception {
@@ -63,41 +58,40 @@ public class TrataCliente implements Runnable {
                 switch (operacao[0]) {
                     case "CONECTAR":
                         conectar(mensagem);
-                    break;
-                    
-                    case "DESCONECTAR":
-                        desconectar(mensagem);
-                    break;
-                    
+                        break;
+
                     case "ENVIAR":
                         enviar(mensagem);
-                    break;
-                    
+                        break;
+
                     case "LISTAR":
-                        listar(mensagem);
-                    break;
-                   
+                        listar(mensagem, operacao);
+                        break;
+
+                    case "DESCONECTAR":
+                        desconectar(mensagem);
+                        break;
                     default:
                         throw new AssertionError();
                 }
 
-            } while (mensagem.getAction() != Mensagem.DESCONECTAR);
+            } while (!mensagem.getAction().equals(Mensagem.DESCONECTAR));
             finalizar();
         } catch (SocketException ex) {
-            
+
         } catch (Exception ex) {
             System.out.println(ex.getMessage());
         }
     }
-    
+
     private void conectar(Mensagem mensagem) throws Exception {
         Cliente cliente = clienteDAO.getByName(mensagem.getNome());
 
         if (cliente == null) {
             cliente = new Cliente(mensagem.getNome(), true);
             if (clienteDAO.insert(cliente)) {
+                this.id = cliente.getId();
                 enviar_mensagem(SUCESSO);
-                enviar_mensagem(clienteDAO.getAll());
             } else {
                 enviar_mensagem(FALHA);
             }
@@ -107,21 +101,47 @@ public class TrataCliente implements Runnable {
             } else {
                 cliente.setConectado(true);
                 clienteDAO.setOnline(cliente);
+                this.id = cliente.getId();
                 enviar_mensagem(SUCESSO);
             }
         }
     }
 
+    private void enviar(Mensagem mensagem) throws Exception {
+        ArrayList<Cliente> clientesConectados = clienteDAO.getWithFilter();
+        mensagem.setIdRemetente(this.id);
+        
+        for (Cliente c : clientesConectados) {
+            if (mensagem.getIdDestinatario() != 0) {
+                if (c.getNome().equals(mensagem.getDestinatario())) {
+                    mensagem.setIdDestinatario(c.getId());
+                    if (mensagemDAO.insertPrivada(mensagem)) {
+                        c.enviar_mensagem(mensagem);
+                        enviar_mensagem(SUCESSO);
+                    } else {
+                        enviar_mensagem(FALHA);
+                    }
+                }
+            } else {
+                if (!c.getNome().equals(mensagem.getNome())) {
+                    if (mensagemDAO.insertGlobal(mensagem)) {
+                        c.enviar_mensagem(mensagem);
+                        enviar_mensagem(SUCESSO);
+                    } else {
+                        enviar_mensagem(FALHA);
+                    }
+                }
+            }
+        }
+    }
+
+    private void listar(Mensagem mensagem, String operacao[]) {
+
+    }
+
     private void desconectar(Mensagem mensagem) {
-        
+        Cliente cliente = clienteDAO.getByName(mensagem.getNome());
+        cliente.setConectado(false);
+        clienteDAO.setOnline(cliente);
     }
-
-    private void enviar(Mensagem mensagem) {
-        
-    }
-
-    private void listar(Mensagem mensagem) {
-        
-    }
-
 }

@@ -2,7 +2,10 @@ package chat.view;
 
 import chat.model.Cliente;
 import chat.model.Mensagem;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListModel;
 import javax.swing.JOptionPane;
@@ -27,7 +30,12 @@ public class Chat extends javax.swing.JFrame {
         initComponents();
 
         config();
-        criarThreads();
+        
+        try {
+            criarThreads();
+        } catch (InterruptedException ex) {
+            Logger.getLogger(Chat.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     private void config() {
@@ -40,10 +48,10 @@ public class Chat extends javax.swing.JFrame {
 
         this.userList.setModel(usuarios);
         this.msgList.setModel(mensagens);
-        this.jComboBox.setModel(destinatarios);
+        this.comboBoxUser.setModel(destinatarios);
     }
 
-    private void criarThreads() {
+    private void criarThreads() throws InterruptedException {
         this.atualizaClientes = new SwingWorker<Void, Void>() {
             @Override
             protected Void doInBackground() throws Exception {
@@ -58,6 +66,7 @@ public class Chat extends javax.swing.JFrame {
                         SwingUtilities.invokeLater(() -> {
                             usuarios.clear();
                             usuarios.addAll(clientes);
+                            listarUsuarios(clientes);
                         });
 
                         Thread.sleep(1000);
@@ -77,13 +86,13 @@ public class Chat extends javax.swing.JFrame {
                         Mensagem mensagem = (Mensagem) cliente.receber_mensagem();
 
                         SwingUtilities.invokeLater(() -> {
-                            if (mensagem.getDestinatario() != 0) {
+                            if (mensagem.getIdDestinatario() != 0) {
                                 mensagens.addElement("[Privada] " + mensagem.toString());
                             } else {
                                 mensagens.addElement(mensagem.toString());
                             }
                         });
-                        
+
                         Thread.sleep(200);
                     } catch (Exception ex) {
                         ex.printStackTrace();
@@ -119,7 +128,7 @@ public class Chat extends javax.swing.JFrame {
         jLabel9 = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
         carregarBtn = new javax.swing.JButton();
-        jComboBox = new javax.swing.JComboBox<>();
+        comboBoxUser = new javax.swing.JComboBox<>();
         jLabel4 = new javax.swing.JLabel();
 
         jLabel2.setText("jLabel2");
@@ -136,6 +145,7 @@ public class Chat extends javax.swing.JFrame {
 
         userList.setBackground(new java.awt.Color(255, 255, 255));
         userList.setBorder(null);
+        userList.setEnabled(false);
         jScrollPane2.setViewportView(userList);
 
         msgTxt.setBackground(new java.awt.Color(255, 255, 255));
@@ -145,6 +155,11 @@ public class Chat extends javax.swing.JFrame {
         msgTxt.setToolTipText("");
         msgTxt.setBorder(javax.swing.BorderFactory.createEtchedBorder());
         msgTxt.setOpaque(true);
+        msgTxt.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                msgTxtKeyPressed(evt);
+            }
+        });
 
         enviarBtn.setBackground(new java.awt.Color(255, 255, 255));
         enviarBtn.setFont(new java.awt.Font("Arial", 1, 14)); // NOI18N
@@ -152,6 +167,7 @@ public class Chat extends javax.swing.JFrame {
         enviarBtn.setIcon(new javax.swing.ImageIcon(getClass().getResource("/message-sent.png"))); // NOI18N
         enviarBtn.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
         enviarBtn.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        enviarBtn.setEnabled(false);
         enviarBtn.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         enviarBtn.setIconTextGap(10);
         enviarBtn.setOpaque(true);
@@ -168,11 +184,13 @@ public class Chat extends javax.swing.JFrame {
         listarBtn.setBackground(new java.awt.Color(255, 255, 255));
         listarBtn.setIcon(new javax.swing.ImageIcon(getClass().getResource("/list-messages.png"))); // NOI18N
         listarBtn.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+        listarBtn.setEnabled(false);
         listarBtn.setName("listar mensagens"); // NOI18N
 
         listarDmBtn.setBackground(new java.awt.Color(255, 255, 255));
         listarDmBtn.setIcon(new javax.swing.ImageIcon(getClass().getResource("/list-private.png"))); // NOI18N
         listarDmBtn.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+        listarDmBtn.setEnabled(false);
 
         connectBtn.setBackground(new java.awt.Color(234, 234, 234));
         connectBtn.setIcon(new javax.swing.ImageIcon(getClass().getResource("/connect.png"))); // NOI18N
@@ -210,15 +228,13 @@ public class Chat extends javax.swing.JFrame {
             public void keyPressed(java.awt.event.KeyEvent evt) {
                 nomeTxtKeyPressed(evt);
             }
-            public void keyReleased(java.awt.event.KeyEvent evt) {
-                nomeTxtKeyReleased(evt);
-            }
         });
 
         msgList.setBackground(new java.awt.Color(255, 255, 255));
         msgList.setFont(new java.awt.Font("Comic Sans MS", 0, 13)); // NOI18N
         msgList.setForeground(new java.awt.Color(0, 0, 0));
         msgList.setToolTipText("");
+        msgList.setEnabled(false);
         jScrollPane3.setViewportView(msgList);
 
         jLabel9.setIcon(new javax.swing.ImageIcon(getClass().getResource("/chat-settings.png"))); // NOI18N
@@ -231,14 +247,16 @@ public class Chat extends javax.swing.JFrame {
         carregarBtn.setBackground(new java.awt.Color(255, 255, 255));
         carregarBtn.setIcon(new javax.swing.ImageIcon(getClass().getResource("/private-sent.png"))); // NOI18N
         carregarBtn.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+        carregarBtn.setEnabled(false);
 
-        jComboBox.setBackground(new java.awt.Color(255, 255, 255));
-        jComboBox.setFont(new java.awt.Font("Comic Sans MS", 0, 14)); // NOI18N
-        jComboBox.setForeground(new java.awt.Color(0, 0, 0));
-        jComboBox.setMaximumRowCount(3);
-        jComboBox.addItemListener(new java.awt.event.ItemListener() {
+        comboBoxUser.setBackground(new java.awt.Color(255, 255, 255));
+        comboBoxUser.setFont(new java.awt.Font("Comic Sans MS", 0, 14)); // NOI18N
+        comboBoxUser.setForeground(new java.awt.Color(0, 0, 0));
+        comboBoxUser.setMaximumRowCount(3);
+        comboBoxUser.setEnabled(false);
+        comboBoxUser.addItemListener(new java.awt.event.ItemListener() {
             public void itemStateChanged(java.awt.event.ItemEvent evt) {
-                jComboBoxItemStateChanged(evt);
+                comboBoxUserItemStateChanged(evt);
             }
         });
 
@@ -275,14 +293,14 @@ public class Chat extends javax.swing.JFrame {
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                                 .addComponent(jSeparator2, javax.swing.GroupLayout.PREFERRED_SIZE, 320, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(29, 29, 29))
+                                .addGap(37, 37, 37))
                             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                                .addComponent(nomeTxt, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(104, 104, 104)))
-                        .addComponent(connectBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(nomeTxt, javax.swing.GroupLayout.PREFERRED_SIZE, 284, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(52, 52, 52)))
+                        .addComponent(connectBtn)
                         .addGap(18, 18, 18)
-                        .addComponent(disconnectBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(35, 35, 35))
+                        .addComponent(disconnectBtn)
+                        .addGap(43, 43, 43))
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGap(12, 12, 12)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
@@ -304,7 +322,7 @@ public class Chat extends javax.swing.JFrame {
                             .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 195, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addGroup(jPanel1Layout.createSequentialGroup()
                                 .addGap(15, 15, 15)
-                                .addComponent(jComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 162, javax.swing.GroupLayout.PREFERRED_SIZE)))))
+                                .addComponent(comboBoxUser, javax.swing.GroupLayout.PREFERRED_SIZE, 162, javax.swing.GroupLayout.PREFERRED_SIZE)))))
                 .addGap(25, 25, 25))
             .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addGroup(jPanel1Layout.createSequentialGroup()
@@ -345,7 +363,7 @@ public class Chat extends javax.swing.JFrame {
                         .addGap(18, 18, 18)
                         .addComponent(jLabel4)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(comboBoxUser, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(34, 34, 34)))
                 .addGap(10, 10, 10))
             .addGroup(jPanel1Layout.createSequentialGroup()
@@ -392,10 +410,11 @@ public class Chat extends javax.swing.JFrame {
             mensagem.setAction(Mensagem.CONECTAR);
 
             this.cliente.enviar_mensagem(mensagem);
-            
+
             String resposta = (String) this.cliente.receber_mensagem();
-            if(resposta.equals("SUCESSO")) {
+            if (resposta.equals("SUCESSO")) {
                 this.atualizaClientes.execute();
+                this.atualizaMensagens.execute();
                 return true;
             } else {
                 JOptionPane.showMessageDialog(this, "Esse usuário já está online");
@@ -406,22 +425,84 @@ public class Chat extends javax.swing.JFrame {
             return false;
         }
     }
-    
-    public void listarClientes() throws Exception {
-        ArrayList<Cliente> clientes = (ArrayList<Cliente>) this.cliente.receber_mensagem();
-        this.usuarios.clear();
-        this.usuarios.addAll(clientes);
+
+    public boolean desconectar() {
+        try {
+            String nome = this.cliente.getNome();
+            Mensagem mensagem = new Mensagem(nome, "");
+            mensagem.setAction(Mensagem.DESCONECTAR);
+
+            this.cliente.enviar_mensagem(mensagem);
+
+            this.atualizaClientes.wait();
+            this.atualizaMensagens.wait();
+            this.cliente.finalizar();
+            return true;
+        } catch (IOException ex) {
+            JOptionPane.showMessageDialog(this, "Algo deu errado!", "Erro", JOptionPane.ERROR_MESSAGE);
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this, "Algo deu errado!", "Erro", JOptionPane.ERROR_MESSAGE);
+        } 
+        
+        return false;
     }
-    
+
+    public boolean enviarMensagem() {
+        try {
+            if (this.comboBoxUser.getSelectedIndex() != 0) {
+                String nome = this.cliente.getNome();
+                String texto = this.msgTxt.getText();
+                String destinatario = (String) this.comboBoxUser.getSelectedItem();
+                
+                Mensagem mensagem = new Mensagem(nome, texto, destinatario);
+                mensagem.setAction(Mensagem.ENVIAR_DM);
+                this.cliente.enviar_mensagem(mensagem);
+                
+                return this.cliente.receber_mensagem() == "SUCESSO";
+            } else {
+                String nome = this.cliente.getNome();
+                String texto = this.msgTxt.getText();
+
+                Mensagem mensagem = new Mensagem(nome, texto);
+                mensagem.setIdDestinatario(0);
+                mensagem.setAction(Mensagem.ENVIAR_GERAL);
+                this.cliente.enviar_mensagem(mensagem);
+                
+                return this.cliente.receber_mensagem() == "SUCESSO";
+            }
+
+        } catch (Exception ex) {
+            System.err.println(ex.getMessage());
+        }
+        return false;
+    }
+
+    public void listarUsuarios(ArrayList<Cliente> clientes) {
+        this.destinatarios.removeAllElements();
+        this.destinatarios.addElement("Para todo mundo");
+
+        for (Cliente c : clientes) {
+            if (!c.getNome().equals(this.cliente.getNome())) {
+                this.destinatarios.addElement(c.getNome());
+            }
+        }
+    }
+
     //-------------> Eventos <-------------\\
 
     private void enviarBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_enviarBtnActionPerformed
-        // TODO add your handling code here:
+        if (!this.msgTxt.getText().isEmpty()) {
+            if (!this.enviarMensagem()) {
+                JOptionPane.showMessageDialog(this, "Não foi possível enviar a mensagem!",
+                        "Erro", JOptionPane.ERROR_MESSAGE);
+            }
+        } else {
+            JOptionPane.showMessageDialog(this, "Escreva alguma coisa!",
+                    "Erro", JOptionPane.WARNING_MESSAGE);
+        }
+        
+        this.msgTxt.setText("");
     }//GEN-LAST:event_enviarBtnActionPerformed
-
-    private void nomeTxtKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_nomeTxtKeyReleased
-
-    }//GEN-LAST:event_nomeTxtKeyReleased
 
     private void nomeTxtKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_nomeTxtKeyPressed
         if (this.nomeTxt.getText().equals("Nome do usuário")) {
@@ -433,7 +514,10 @@ public class Chat extends javax.swing.JFrame {
         if (this.nomeTxt.getText().isEmpty()) {
             this.nomeTxt.setText("Escreva seu nome!!");
         } else {
-            if (!this.conectar()) {
+            if (this.conectar()) {
+                this.enableChat(true);
+                this.connectBtn.setEnabled(false);
+            } else {
                 this.disconnectBtnActionPerformed(evt);
             }
 
@@ -442,20 +526,38 @@ public class Chat extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_connectBtnActionPerformed
 
-    private void jComboBoxItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_jComboBoxItemStateChanged
-
-    }//GEN-LAST:event_jComboBoxItemStateChanged
+    private void comboBoxUserItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_comboBoxUserItemStateChanged
+        if (this.comboBoxUser.getSelectedIndex() != 0) {
+            String nome = (String) this.comboBoxUser.getSelectedItem();
+            this.msgTxt.setText("  Escreva sua mensagem para " + nome);
+        } else {
+            this.msgTxt.setText("  Escreva sua mensagem");
+        }
+    }//GEN-LAST:event_comboBoxUserItemStateChanged
 
     private void disconnectBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_disconnectBtnActionPerformed
-        
+        if (this.desconectar()) {
+            this.disconnectBtn.setEnabled(false);
+            this.enableChat(false);
+        }
     }//GEN-LAST:event_disconnectBtnActionPerformed
 
+    private void msgTxtKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_msgTxtKeyPressed
+        if (this.msgTxt.getText().equals("  Escreva sua mensagem")) {
+            this.msgTxt.setText("");
+        }
+    }//GEN-LAST:event_msgTxtKeyPressed
+
     //-------------> Métodos visuais <-------------\\
-    
-    private void setChatEnabled(boolean op) {
+    private void enableChat(boolean op) {
         this.msgTxt.setEnabled(op);
         this.enviarBtn.setEnabled(op);
         this.userList.setVisible(op);
+        this.msgList.setEnabled(op);
+        this.listarBtn.setEnabled(op);
+        this.listarDmBtn.setEnabled(op);
+        this.carregarBtn.setEnabled(op);
+        this.comboBoxUser.setEnabled(op);
     }
 
     public static void main(String args[]) {
@@ -479,10 +581,10 @@ public class Chat extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton carregarBtn;
+    private javax.swing.JComboBox<String> comboBoxUser;
     private javax.swing.JButton connectBtn;
     private javax.swing.JButton disconnectBtn;
     private javax.swing.JButton enviarBtn;
-    private javax.swing.JComboBox<String> jComboBox;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
