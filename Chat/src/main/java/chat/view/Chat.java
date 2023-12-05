@@ -2,8 +2,12 @@ package chat.view;
 
 import chat.model.Cliente;
 import chat.model.Mensagem;
+import java.util.ArrayList;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListModel;
+import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
+import javax.swing.SwingWorker;
 
 /**
  *
@@ -12,35 +16,84 @@ import javax.swing.DefaultListModel;
 public class Chat extends javax.swing.JFrame {
 
     private DefaultListModel<Cliente> usuarios;
-    private DefaultListModel<Mensagem> mensagens;
+    private DefaultListModel<String> mensagens;
     private DefaultComboBoxModel<String> destinatarios;
-    
+
+    private Cliente cliente;
+    private SwingWorker atualizaClientes;
+    private SwingWorker atualizaMensagens;
+
     public Chat() {
         initComponents();
-        
+
         config();
+        criarThreads();
     }
-    
-    private void config () {
+
+    private void config() {
         this.setLocationRelativeTo(null);
         this.usuarios = new DefaultListModel<>();
         this.mensagens = new DefaultListModel<>();
         this.destinatarios = new DefaultComboBoxModel<>();
-        
+
         this.destinatarios.addElement("Todo mundo");
-        
+
         this.userList.setModel(usuarios);
         this.msgList.setModel(mensagens);
         this.jComboBox.setModel(destinatarios);
-        this.setChatEnabled(false);
     }
-    
-    private void setChatEnabled (boolean op) {
-        this.msgTxt.setEnabled(op);
-        this.enviarBtn.setEnabled(op);
-        this.userList.setVisible(op);
+
+    private void criarThreads() {
+        this.atualizaClientes = new SwingWorker<Void, Void>() {
+            @Override
+            protected Void doInBackground() throws Exception {
+                while (cliente.isConectado()) {
+                    try {
+                        Mensagem mensagem = new Mensagem(cliente.getNome(), "");
+                        mensagem.setAction(Mensagem.LISTAR_USERS);
+
+                        cliente.enviar_mensagem(mensagem);
+                        ArrayList<Cliente> clientes = (ArrayList<Cliente>) cliente.receber_mensagem();
+
+                        SwingUtilities.invokeLater(() -> {
+                            usuarios.clear();
+                            usuarios.addAll(clientes);
+                        });
+
+                        Thread.sleep(1000);
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                    }
+                }
+                return null;
+            }
+        };
+
+        this.atualizaMensagens = new SwingWorker<Void, Mensagem>() {
+            @Override
+            protected Void doInBackground() throws Exception {
+                while (cliente.isConectado()) {
+                    try {
+                        Mensagem mensagem = (Mensagem) cliente.receber_mensagem();
+
+                        SwingUtilities.invokeLater(() -> {
+                            if (mensagem.getDestinatario() != 0) {
+                                mensagens.addElement("[Privada] " + mensagem.toString());
+                            } else {
+                                mensagens.addElement(mensagem.toString());
+                            }
+                        });
+                        
+                        Thread.sleep(200);
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                    }
+                }
+                return null;
+            }
+        };
     }
-    
+
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -135,6 +188,11 @@ public class Chat extends javax.swing.JFrame {
         disconnectBtn.setIcon(new javax.swing.ImageIcon(getClass().getResource("/disconnect.png"))); // NOI18N
         disconnectBtn.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
         disconnectBtn.setFocusCycleRoot(true);
+        disconnectBtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                disconnectBtnActionPerformed(evt);
+            }
+        });
 
         jLabel3.setFont(new java.awt.Font("Comic Sans MS", 1, 28)); // NOI18N
         jLabel3.setForeground(new java.awt.Color(0, 0, 0));
@@ -178,7 +236,6 @@ public class Chat extends javax.swing.JFrame {
         jComboBox.setFont(new java.awt.Font("Comic Sans MS", 0, 14)); // NOI18N
         jComboBox.setForeground(new java.awt.Color(0, 0, 0));
         jComboBox.setMaximumRowCount(3);
-        jComboBox.setSelectedIndex(-1);
         jComboBox.addItemListener(new java.awt.event.ItemListener() {
             public void itemStateChanged(java.awt.event.ItemEvent evt) {
                 jComboBoxItemStateChanged(evt);
@@ -324,12 +381,46 @@ public class Chat extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    //-------------> Métodos úteis <-------------\\
+    
+    public boolean conectar() {
+        try {
+            String nome = nomeTxt.getText();
+            this.cliente = new Cliente("192.168.2.165", 15500, nome);
+
+            Mensagem mensagem = new Mensagem(nome, "");
+            mensagem.setAction(Mensagem.CONECTAR);
+
+            this.cliente.enviar_mensagem(mensagem);
+            
+            String resposta = (String) this.cliente.receber_mensagem();
+            if(resposta.equals("SUCESSO")) {
+                this.atualizaClientes.execute();
+                return true;
+            } else {
+                JOptionPane.showMessageDialog(this, "Esse usuário já está online");
+                return false;
+            }
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this, "Falha na conexão", "Erro", JOptionPane.ERROR_MESSAGE);
+            return false;
+        }
+    }
+    
+    public void listarClientes() throws Exception {
+        ArrayList<Cliente> clientes = (ArrayList<Cliente>) this.cliente.receber_mensagem();
+        this.usuarios.clear();
+        this.usuarios.addAll(clientes);
+    }
+    
+    //-------------> Eventos <-------------\\
+
     private void enviarBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_enviarBtnActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_enviarBtnActionPerformed
 
     private void nomeTxtKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_nomeTxtKeyReleased
-        
+
     }//GEN-LAST:event_nomeTxtKeyReleased
 
     private void nomeTxtKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_nomeTxtKeyPressed
@@ -342,15 +433,30 @@ public class Chat extends javax.swing.JFrame {
         if (this.nomeTxt.getText().isEmpty()) {
             this.nomeTxt.setText("Escreva seu nome!!");
         } else {
+            if (!this.conectar()) {
+                this.disconnectBtnActionPerformed(evt);
+            }
+
             this.nomeTxt.setEditable(false);
-            this.nomeTxt.setCursor(null);
             this.connectBtn.setEnabled(false);
         }
     }//GEN-LAST:event_connectBtnActionPerformed
 
     private void jComboBoxItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_jComboBoxItemStateChanged
-        
+
     }//GEN-LAST:event_jComboBoxItemStateChanged
+
+    private void disconnectBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_disconnectBtnActionPerformed
+        
+    }//GEN-LAST:event_disconnectBtnActionPerformed
+
+    //-------------> Métodos visuais <-------------\\
+    
+    private void setChatEnabled(boolean op) {
+        this.msgTxt.setEnabled(op);
+        this.enviarBtn.setEnabled(op);
+        this.userList.setVisible(op);
+    }
 
     public static void main(String args[]) {
         /* Set the Nimbus look and feel */
@@ -391,7 +497,7 @@ public class Chat extends javax.swing.JFrame {
     private javax.swing.JSeparator jSeparator3;
     private javax.swing.JButton listarBtn;
     private javax.swing.JButton listarDmBtn;
-    private javax.swing.JList<Mensagem> msgList;
+    private javax.swing.JList<String> msgList;
     private javax.swing.JTextField msgTxt;
     private javax.swing.JTextField nomeTxt;
     private javax.swing.JList<Cliente> userList;

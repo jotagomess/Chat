@@ -36,7 +36,28 @@ public class ClienteDAO {
         return true;
     }
     
-    public ArrayList<Cliente> selectAll() {
+    public ArrayList<Cliente> getWithFilter() {
+        ArrayList<Cliente> clientes = new ArrayList<>();
+        String sql = "SELECT id, nome, conectado FROM chat.clientes WHERE conectado = true ORDER BY conectado";
+        
+        try(PreparedStatement trans = this.c.prepareStatement(sql)) {
+            ResultSet resultado = trans.executeQuery();
+            
+            while (resultado.next()) {                
+                Cliente cliente = new Cliente(resultado.getInt("id"), 
+                        resultado.getString("nome"),
+                   resultado.getBoolean("conectado"));
+                clientes.add(cliente);
+            }
+            
+        }catch(SQLException ex){
+            System.out.println(ex.getMessage());
+        }
+        
+        return clientes;
+    }
+    
+    public ArrayList<Cliente> getAll() {
         ArrayList<Cliente> clientes = new ArrayList<>();
         String sql = "SELECT id, nome, conectado FROM chat.clientes ORDER BY conectado";
         
@@ -57,7 +78,7 @@ public class ClienteDAO {
         return clientes;
     }
     
-    public Cliente selectByName(String nome) {
+    public Cliente getByName(String nome) {
         String sql = "SELECT nome, id, online FROM chat.clientes WHERE nome = ?";
         
         try(PreparedStatement trans = this.c.prepareStatement(sql)) {
@@ -78,7 +99,7 @@ public class ClienteDAO {
         }
     }
     
-    public Cliente selectById(int id) {
+    public Cliente getById(int id) {
         String sql = "SELECT nome, id, online FROM chat.clientes WHERE id = ?";
         
         try(PreparedStatement trans = this.c.prepareStatement(sql)) {

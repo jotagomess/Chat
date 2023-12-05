@@ -7,6 +7,9 @@ import java.io.Serializable;
  */
 public class Mensagem implements Serializable {
     
+    public static final String CONECTAR = "CONECTAR_", DESCONECTAR = "DESCONECTAR_", ENVIAR_GERAL = "ENVIAR_GERAL_", ENVIAR_DM = "ENVIAR_DM";
+    public static final String LISTAR_GERAL = "LISTAR_GERAL", LISTAR_DM = "LISTAR_DM", LISTAR_USERS = "LISTAR_USERS";
+    
     private int id;
     private String nome;
     private String texto;
@@ -14,8 +17,13 @@ public class Mensagem implements Serializable {
     private int remetente;
     private int destinatario;
     
-    public Mensagem(String nome, int id, String texto) {
+    public Mensagem(String nome, String texto) {
         super();
+        this.nome = nome;
+        this.texto = texto;
+    }
+    
+    public Mensagem(String nome, int id, String texto) {
         this.nome = nome;
         this.id = id;
         this.texto = texto;
@@ -69,7 +77,7 @@ public class Mensagem implements Serializable {
     
     @Override
     public String toString() {
-        return nome+": " + texto + "\n\n";
+        return nome+": " + texto + "\n";
     }
 
     public long getRemetente() {

@@ -1,6 +1,5 @@
 package chat.server;
 
-import chat.control.TrataCliente;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -24,14 +23,12 @@ public class Servidor {
 
     public static void main(String[] args) throws Exception {
         Servidor servidor = new Servidor(15500);
-        ArrayList<Socket> clientesConectados = new ArrayList<>();
         Socket soqueteCliente = null;
         
         while (true) {
             try {
                 soqueteCliente = servidor.soquete_servidor.accept();
-                clientesConectados.add(soqueteCliente);
-                new Thread(new TrataCliente(soqueteCliente, clientesConectados)).start();
+                new Thread(new TrataCliente(soqueteCliente)).start();
             } catch (IOException e) {
                 e.printStackTrace();
             }
