@@ -7,7 +7,7 @@ import java.io.Serializable;
  */
 public class Mensagem implements Serializable {
     
-    public static final String CONECTAR = "CONECTAR_", DESCONECTAR = "DESCONECTAR_", ENVIAR_GERAL = "ENVIAR_GERAL_", ENVIAR_DM = "ENVIAR_DM";
+    public static final String CONECTAR = "CONECTAR_", DESCONECTAR = "DESCONECTAR_", ENVIAR = "ENVIAR_";
     public static final String LISTAR_GERAL = "LISTAR_GERAL", LISTAR_DM = "LISTAR_DM", LISTAR_USERS = "LISTAR_USERS";
     
     private int id;

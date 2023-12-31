@@ -19,7 +19,7 @@ public class ClienteDAO {
         this.c = FactoryPostgres.getConexaoPostgres();
     }
     
-    public boolean insert(Cliente cliente) {
+    public Cliente insert(Cliente cliente) {
         String sql = "INSERT INTO chat.clientes(nome, conectado) VALUES (?,?) returning id";
         
         try(PreparedStatement trans = this.c.prepareStatement(sql)){
@@ -28,12 +28,13 @@ public class ClienteDAO {
             
             ResultSet resultado = trans.executeQuery();
             if(resultado.next()) {
-                cliente.setId(resultado.getInt("id"));
+                cliente.setId(resultado.getInt("id")+1);
+                return cliente;
             }
         }catch(SQLException ex){
             System.out.println(ex.getMessage());
         }
-        return true;
+        return null;
     }
     
     public ArrayList<Cliente> getWithFilter() {
@@ -44,9 +45,10 @@ public class ClienteDAO {
             ResultSet resultado = trans.executeQuery();
             
             while (resultado.next()) {                
-                Cliente cliente = new Cliente(resultado.getInt("id"), 
-                        resultado.getString("nome"),
-                   resultado.getBoolean("conectado"));
+                Cliente cliente = new Cliente();
+                cliente.setConectado(resultado.getBoolean("conectado"));
+                cliente.setId(resultado.getInt("id")+1);
+                cliente.setNome(resultado.getString("nome"));
                 clientes.add(cliente);
             }
             
@@ -65,9 +67,10 @@ public class ClienteDAO {
             ResultSet resultado = trans.executeQuery();
             
             while (resultado.next()) {                
-                Cliente cliente = new Cliente(resultado.getInt("id"), 
-                        resultado.getString("nome"),
-                   resultado.getBoolean("conectado"));
+                Cliente cliente = new Cliente();
+                cliente.setConectado(resultado.getBoolean("conectado"));
+                cliente.setId(resultado.getInt("id")+1);
+                cliente.setNome(resultado.getString("nome"));
                 clientes.add(cliente);
             }
             
@@ -79,16 +82,17 @@ public class ClienteDAO {
     }
     
     public Cliente getByName(String nome) {
-        String sql = "SELECT nome, id, online FROM chat.clientes WHERE nome = ?";
+        String sql = "SELECT nome, id, conectado FROM chat.clientes WHERE nome = ?";
         
         try(PreparedStatement trans = this.c.prepareStatement(sql)) {
             trans.setString(1, nome);
             
             ResultSet resultado = trans.executeQuery();
             if(resultado.next()) {
-                Cliente cliente = new Cliente(resultado.getInt("id"), 
-                        resultado.getString("nome"),
-                   resultado.getBoolean("conectado"));
+                Cliente cliente = new Cliente();
+                cliente.setConectado(resultado.getBoolean("conectado"));
+                cliente.setId(resultado.getInt("id")+1);
+                cliente.setNome(nome);
                 return cliente;
             }else {
                 return null;
@@ -100,16 +104,17 @@ public class ClienteDAO {
     }
     
     public Cliente getById(int id) {
-        String sql = "SELECT nome, id, online FROM chat.clientes WHERE id = ?";
+        String sql = "SELECT nome, id, conectado FROM chat.clientes WHERE id = ?";
         
         try(PreparedStatement trans = this.c.prepareStatement(sql)) {
             trans.setInt(1, id);
             
             ResultSet resultado = trans.executeQuery();
             if(resultado.next()) {
-                Cliente cliente = new Cliente(resultado.getInt("id"), 
-                        resultado.getString("nome"),
-                   resultado.getBoolean("conectado"));
+                Cliente cliente = new Cliente();
+                cliente.setConectado(resultado.getBoolean("conectado"));
+                cliente.setId(id);
+                cliente.setNome(resultado.getString("nome"));
                 return cliente;
             }else {
                 return null;
@@ -120,12 +125,12 @@ public class ClienteDAO {
         }
     }
     
-    public boolean setOnline(Cliente cliente) {
-        String sql = "UPDATE chat.clientes SET online = ? WHERE id = ?";
+    public boolean setConection(int id, boolean conectado) {
+        String sql = "UPDATE chat.clientes SET conectado = ? WHERE id = ?";
         
         try(PreparedStatement trans = this.c.prepareStatement(sql)) {
-            trans.setBoolean(1,cliente.isConectado());
-            trans.setInt(2, cliente.getId());
+            trans.setBoolean(1,conectado);
+            trans.setInt(2, id);
             
             trans.execute();
             return true;

@@ -38,6 +38,15 @@ public class Cliente implements Serializable {
         this.conectado = conectado;
     }
     
+    public Cliente(int id, boolean conectado){
+        this.id = id;
+        this.conectado = conectado;
+    }
+    
+    public Cliente() {
+        
+    }
+    
     public int getId() {
         return id;
     }

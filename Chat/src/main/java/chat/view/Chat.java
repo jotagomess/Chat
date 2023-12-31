@@ -3,6 +3,7 @@ package chat.view;
 import chat.model.Cliente;
 import chat.model.Mensagem;
 import java.io.IOException;
+import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -25,12 +26,13 @@ public class Chat extends javax.swing.JFrame {
     private Cliente cliente;
     private SwingWorker atualizaClientes;
     private SwingWorker atualizaMensagens;
+    private boolean run = false;
 
     public Chat() {
         initComponents();
 
         config();
-        
+
         try {
             criarThreads();
         } catch (InterruptedException ex) {
@@ -49,13 +51,14 @@ public class Chat extends javax.swing.JFrame {
         this.userList.setModel(usuarios);
         this.msgList.setModel(mensagens);
         this.comboBoxUser.setModel(destinatarios);
+        this.disconnectBtn.setEnabled(false);
     }
 
     private void criarThreads() throws InterruptedException {
         this.atualizaClientes = new SwingWorker<Void, Void>() {
             @Override
             protected Void doInBackground() throws Exception {
-                while (cliente.isConectado()) {
+                while (run) {
                     try {
                         Mensagem mensagem = new Mensagem(cliente.getNome(), "");
                         mensagem.setAction(Mensagem.LISTAR_USERS);
@@ -70,6 +73,12 @@ public class Chat extends javax.swing.JFrame {
                         });
 
                         Thread.sleep(1000);
+                    } catch (SocketException ex) {
+                        if (ex.getMessage().equalsIgnoreCase("Socket closed")) {
+                            break;
+                        } else {
+                            ex.printStackTrace();
+                        }
                     } catch (Exception ex) {
                         ex.printStackTrace();
                     }
@@ -81,19 +90,28 @@ public class Chat extends javax.swing.JFrame {
         this.atualizaMensagens = new SwingWorker<Void, Mensagem>() {
             @Override
             protected Void doInBackground() throws Exception {
-                while (cliente.isConectado()) {
+                while (run) {
                     try {
                         Mensagem mensagem = (Mensagem) cliente.receber_mensagem();
 
-                        SwingUtilities.invokeLater(() -> {
-                            if (mensagem.getIdDestinatario() != 0) {
-                                mensagens.addElement("[Privada] " + mensagem.toString());
-                            } else {
-                                mensagens.addElement(mensagem.toString());
-                            }
-                        });
+                        if (mensagem.getAction().contains("ENVIAR")) {
+                            SwingUtilities.invokeLater(() -> {
+                                if (mensagem.getIdDestinatario() != 0) {
+                                    mensagens.addElement("[Privada] " + mensagem.toString());
+                                } else {
+                                    mensagens.addElement(mensagem.toString());
+                                }
+                            });
+                        }
 
                         Thread.sleep(200);
+                    } catch (SocketException ex) {
+                        if (ex.getMessage().equalsIgnoreCase("Socket closed")) {
+                            break;
+                        } else {
+
+                            ex.printStackTrace();
+                        }
                     } catch (Exception ex) {
                         ex.printStackTrace();
                     }
@@ -400,11 +418,10 @@ public class Chat extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     //-------------> Métodos úteis <-------------\\
-    
     public boolean conectar() {
         try {
             String nome = nomeTxt.getText();
-            this.cliente = new Cliente("192.168.2.165", 15500, nome);
+            this.cliente = new Cliente("127.0.0.1", 15500, nome);
 
             Mensagem mensagem = new Mensagem(nome, "");
             mensagem.setAction(Mensagem.CONECTAR);
@@ -413,15 +430,22 @@ public class Chat extends javax.swing.JFrame {
 
             String resposta = (String) this.cliente.receber_mensagem();
             if (resposta.equals("SUCESSO")) {
+                run = true;
                 this.atualizaClientes.execute();
                 this.atualizaMensagens.execute();
                 return true;
-            } else {
+
+            } else if (resposta.equals("USER_EXISTS")) {
                 JOptionPane.showMessageDialog(this, "Esse usuário já está online");
+                return false;
+
+            } else {
+                JOptionPane.showMessageDialog(this, "Não foi possível se conectar ao servidor!",
+                        "Erro", JOptionPane.ERROR_MESSAGE);
                 return false;
             }
         } catch (Exception ex) {
-            JOptionPane.showMessageDialog(this, "Falha na conexão", "Erro", JOptionPane.ERROR_MESSAGE);
+            Logger.getLogger(Chat.class.getName()).log(Level.SEVERE, null, ex);
             return false;
         }
     }
@@ -432,19 +456,17 @@ public class Chat extends javax.swing.JFrame {
             Mensagem mensagem = new Mensagem(nome, "");
             mensagem.setAction(Mensagem.DESCONECTAR);
 
+            run = false;
             this.cliente.enviar_mensagem(mensagem);
-
-            this.atualizaClientes.wait();
-            this.atualizaMensagens.wait();
             this.cliente.finalizar();
             return true;
         } catch (IOException ex) {
-            JOptionPane.showMessageDialog(this, "Algo deu errado!", "Erro", JOptionPane.ERROR_MESSAGE);
+            Logger.getLogger(Chat.class.getName()).log(Level.SEVERE, null, ex);
+            return false;
         } catch (Exception ex) {
-            JOptionPane.showMessageDialog(this, "Algo deu errado!", "Erro", JOptionPane.ERROR_MESSAGE);
-        } 
-        
-        return false;
+            Logger.getLogger(Chat.class.getName()).log(Level.SEVERE, null, ex);
+            return false;
+        }
     }
 
     public boolean enviarMensagem() {
@@ -453,11 +475,11 @@ public class Chat extends javax.swing.JFrame {
                 String nome = this.cliente.getNome();
                 String texto = this.msgTxt.getText();
                 String destinatario = (String) this.comboBoxUser.getSelectedItem();
-                
+
                 Mensagem mensagem = new Mensagem(nome, texto, destinatario);
-                mensagem.setAction(Mensagem.ENVIAR_DM);
+                mensagem.setAction(Mensagem.ENVIAR);
                 this.cliente.enviar_mensagem(mensagem);
-                
+
                 return this.cliente.receber_mensagem() == "SUCESSO";
             } else {
                 String nome = this.cliente.getNome();
@@ -465,9 +487,9 @@ public class Chat extends javax.swing.JFrame {
 
                 Mensagem mensagem = new Mensagem(nome, texto);
                 mensagem.setIdDestinatario(0);
-                mensagem.setAction(Mensagem.ENVIAR_GERAL);
+                mensagem.setAction(Mensagem.ENVIAR);
                 this.cliente.enviar_mensagem(mensagem);
-                
+
                 return this.cliente.receber_mensagem() == "SUCESSO";
             }
 
@@ -500,7 +522,7 @@ public class Chat extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(this, "Escreva alguma coisa!",
                     "Erro", JOptionPane.WARNING_MESSAGE);
         }
-        
+
         this.msgTxt.setText("");
     }//GEN-LAST:event_enviarBtnActionPerformed
 
@@ -516,13 +538,9 @@ public class Chat extends javax.swing.JFrame {
         } else {
             if (this.conectar()) {
                 this.enableChat(true);
-                this.connectBtn.setEnabled(false);
-            } else {
-                this.disconnectBtnActionPerformed(evt);
             }
 
             this.nomeTxt.setEditable(false);
-            this.connectBtn.setEnabled(false);
         }
     }//GEN-LAST:event_connectBtnActionPerformed
 
@@ -537,8 +555,10 @@ public class Chat extends javax.swing.JFrame {
 
     private void disconnectBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_disconnectBtnActionPerformed
         if (this.desconectar()) {
-            this.disconnectBtn.setEnabled(false);
             this.enableChat(false);
+        } else {
+            JOptionPane.showMessageDialog(this, "Algo deu errado!", 
+                    "Erro", JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_disconnectBtnActionPerformed
 
@@ -550,6 +570,9 @@ public class Chat extends javax.swing.JFrame {
 
     //-------------> Métodos visuais <-------------\\
     private void enableChat(boolean op) {
+        this.disconnectBtn.setEnabled(op);
+        this.connectBtn.setEnabled(!op);
+
         this.msgTxt.setEnabled(op);
         this.enviarBtn.setEnabled(op);
         this.userList.setVisible(op);
@@ -577,6 +600,7 @@ public class Chat extends javax.swing.JFrame {
                 new Chat().setVisible(true);
             }
         });
+
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
