@@ -86,7 +86,7 @@ public class Chat extends javax.swing.JFrame {
                 return null;
             }
         };
-
+        this.atualizaClientes.execute();
         this.atualizaMensagens = new SwingWorker<Void, Mensagem>() {
             @Override
             protected Void doInBackground() throws Exception {
@@ -119,6 +119,7 @@ public class Chat extends javax.swing.JFrame {
                 return null;
             }
         };
+        this.atualizaMensagens.execute();
     }
 
     @SuppressWarnings("unchecked")
@@ -336,11 +337,11 @@ public class Chat extends javax.swing.JFrame {
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGap(18, 18, 18)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel4)
                             .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 195, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel4)
                             .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addGap(15, 15, 15)
-                                .addComponent(comboBoxUser, javax.swing.GroupLayout.PREFERRED_SIZE, 162, javax.swing.GroupLayout.PREFERRED_SIZE)))))
+                                .addGap(6, 6, 6)
+                                .addComponent(comboBoxUser, javax.swing.GroupLayout.PREFERRED_SIZE, 174, javax.swing.GroupLayout.PREFERRED_SIZE)))))
                 .addGap(25, 25, 25))
             .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addGroup(jPanel1Layout.createSequentialGroup()
